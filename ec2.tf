@@ -1,6 +1,9 @@
 resource "aws_key_pair" "my_key" {
-  key_name = "terra-ansible"
+  key_name = "${var.env}-terra-ansible"
   public_key = file("terra-ansible.pem.pub")
+  tags = {
+    Environment = var.env
+  }
 }
 
 resource "aws_default_vpc" "default" {
@@ -8,7 +11,7 @@ resource "aws_default_vpc" "default" {
 }
 
 resource "aws_security_group" "my_secgroup" {
-  name = "autmate-sg"
+  name = "${var.env}-autmate-sg"
   description = "for tf-ansible"
   vpc_id = aws_default_vpc.default.id
 
@@ -55,5 +58,6 @@ resource "aws_instance" "my_instance" {
   }
   tags = {
     Name = each.key
+    Environment = var.env
   }
 }
