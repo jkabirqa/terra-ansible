@@ -1,7 +1,9 @@
 ---
 - hosts: all
   become: true
-
+  vars:
+    web_root: /var/www/html
+    web_file: index.html
   tasks:
     - name: Install web server
       package:
@@ -13,10 +15,18 @@
         name: "{{ 'apache2' if ansible_facts['os_family'] == 'Debian' else 'httpd' }}"
         state: started
         enabled: yes
-    - name: Copy file with owner and permissions
+    - name: Ensure web root exists
+      file:
+        path: "{{ web_root }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Copy OS-specific index.html
       copy:
-        src: index.html
-        dest: /var/www/html/index.html
+        src: "{{ web_file }}"
+        dest: "{{ web_root }}/{{ web_file }}"
         owner: root
         group: root
         mode: '0644'
